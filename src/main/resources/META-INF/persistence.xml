@@ -1,0 +1,27 @@
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence" version="3.0">
+
+    <persistence-unit name="erpPU">
+
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+
+        <class>com.erp.model.Client</class>
+        <class>com.erp.model.Produit</class>
+        <class>com.erp.model.Commande</class>
+        <class>com.erp.model.LigneCommande</class>
+        <class>com.erp.model.Facture</class>
+        <class>com.erp.model.Utilisateur</class>
+
+        <properties>
+            <property name="jakarta.persistence.jdbc.url"
+                      value="jdbc:mysql://localhost:3306/erp"/>
+            <property name="jakarta.persistence.jdbc.user" value="root"/>
+            <property name="jakarta.persistence.jdbc.password" value="Stephen:curry4"/>
+            <property name="jakarta.persistence.jdbc.driver"
+                      value="com.mysql.cj.jdbc.Driver"/>
+
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
+            <property name="hibernate.show_sql" value="true"/>
+        </properties>
+
+    </persistence-unit>
+</persistence>
