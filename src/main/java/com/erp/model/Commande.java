@@ -26,13 +26,17 @@ public class Commande {
     @OneToMany(mappedBy = "commande", cascade = CascadeType.ALL)
     private List<LigneCommande> lignes;
 
-    @OneToMany(mappedBy = "commande", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "commande", cascade = CascadeType.ALL)
     private Facture facture;
 
     public Commande() {}
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public LocalDate getDate() {
