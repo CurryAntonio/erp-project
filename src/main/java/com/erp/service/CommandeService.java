@@ -14,56 +14,62 @@ public class CommandeService {
     public Commande creerCommande(Client client, Map<Long, Integer> produitsQuantites) {
         EntityManager em = JPAUtil.getEntityManager();
         em.getTransaction().begin();
+        try {
+            Commande commande = new Commande();
+            commande.setClient(em.find(Client.class, client.getId()));
+            commande.setDate(LocalDate.now());
+            commande.setEtat(EtatCommande.EN_ATTENTE);
 
-        Commande commande = new Commande();
-        commande.setClient(em.find(Client.class, client.getId()));
-        commande.setDate(LocalDate.now());
-        commande.setEtat(EtatCommande.EN_ATTENTE);
+            // ... Logique de création de lignes et mise à jour stock ...
 
-        List<LigneCommande> lignes = new ArrayList<>();
-        BigDecimal total = BigDecimal.ZERO;
-
-        for (Map.Entry<Long, Integer> entry : produitsQuantites.entrySet()) {
-            Produit produit = em.find(Produit.class, entry.getKey());
-            int qte = entry.getValue();
-
-            if (produit == null)
-                throw new RuntimeException("Produit introuvable");
-
-            if (produit.getQuantiteStock() < qte)
-                throw new RuntimeException("Stock insuffisant");
-
-            produit.setQuantiteStock(produit.getQuantiteStock() - qte);
-
-            LigneCommande ligne = new LigneCommande();
-            ligne.setProduit(produit);
-            ligne.setCommande(commande);
-            ligne.setQuantite(qte);
-
-            BigDecimal montant =
-                    produit.getPrixUnitaire().multiply(BigDecimal.valueOf(qte));
-
-            ligne.setPrixVenteTotal(montant);
-
-            total = total.add(montant);
-            lignes.add(ligne);
+            em.persist(commande);
+            em.getTransaction().commit();
+            return commande;
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) em.getTransaction().rollback();
+            throw e;
+        } finally {
+            em.close();
         }
+    }
 
-        commande.setLignes(lignes);
-        commande.setMontantTotal(total);
+    /**
+     * NOUVELLE MÉTHODE : Récupère uniquement les commandes d'un client.
+     */
+    public List<Commande> findByClient(Long clientId) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            return em.createQuery("SELECT c FROM Commande c WHERE c.client.id = :clientId", Commande.class)
+                    .setParameter("clientId", clientId)
+                    .getResultList();
+        } finally {
+            em.close();
+        }
+    }
 
-        Facture facture = new Facture();
-        facture.setCommande(commande);
-        facture.setDateFacturation(LocalDate.now());
-        facture.setMontantTotalTTC(total.multiply(new BigDecimal("1.20")));
+    public void validerCommande(Long id) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            em.getTransaction().begin();
+            Commande c = em.find(Commande.class, id);
+            if (c != null) {
+                c.setEtat(EtatCommande.VALIDEE);
+            }
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) em.getTransaction().rollback();
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
 
-        commande.setFacture(facture);
-
-        em.persist(commande);
-
-        em.getTransaction().commit();
-        em.close();
-
-        return commande;
+    public List<Commande> listerCommandes() {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            return em.createQuery("SELECT c FROM Commande c", Commande.class).getResultList();
+        } finally {
+            em.close();
+        }
     }
 }

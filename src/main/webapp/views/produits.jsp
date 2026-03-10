@@ -1,48 +1,38 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-
-<!DOCTYPE html>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <html>
 <head>
-    <title>Produits</title>
+    <title>Stocks - ERP</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
 </head>
 <body>
-
-<h2>Gestion Produits</h2>
-
-<form method="post" action="${pageContext.request.contextPath}/produits">
-
-    Libellé : <input type="text" name="libelle"><br><br>
-    Référence : <input type="text" name="reference"><br><br>
-    Prix : <input type="number" step="0.01" name="prix"><br><br>
-    Stock : <input type="number" name="stock"><br><br>
-
-    <button type="submit">Ajouter</button>
-</form>
-
-<hr>
-
-<table border="1">
-<tr>
-    <th>ID</th>
-    <th>Libellé</th>
-    <th>Prix</th>
-    <th>Stock</th>
-</tr>
-
-<c:forEach items="${produits}" var="p">
-<tr>
-    <td>${p.id}</td>
-    <td>${p.libelle}</td>
-    <td>${p.prixUnitaire}</td>
-    <td>${p.quantiteStock}</td>
-</tr>
-</c:forEach>
-
-</table>
-
-<br>
-<a href="dashboard">Retour</a>
-
+    <div class="container">
+        <nav style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 2px solid #eee; margin-bottom: 20px;">
+            <a href="${pageContext.request.contextPath}/dashboard">🏠 Retour Accueil</a>
+            <span>Session : <strong>${sessionScope.user.login}</strong></span>
+        </nav>
+        <h2>Inventaire des Produits</h2>
+        <table>
+            <thead>
+                <tr><th>Libellé</th><th>Référence</th><th>Prix</th><th>Stock</th></tr>
+            </thead>
+            <tbody>
+                <c:forEach items="${produits}" var="p">
+                    <tr>
+                        <td>${p.libelle}</td>
+                        <td>${p.reference}</td>
+                        <td><fmt:formatNumber value="${p.prixUnitaire}" groupingUsed="true"/> Ar</td>
+                        <td>
+                            <c:choose>
+                                <c:when test="${sessionScope.user.role == 'CLIENT'}">Disponible</c:when>
+                                <c:otherwise>${p.quantiteStock} unités</c:otherwise>
+                            </c:choose>
+                        </td>
+                    </tr>
+                </c:forEach>
+            </tbody>
+        </table>
+    </div>
 </body>
 </html>

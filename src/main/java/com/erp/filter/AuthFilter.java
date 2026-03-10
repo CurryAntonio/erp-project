@@ -5,33 +5,27 @@ import jakarta.servlet.http.*;
 import java.io.IOException;
 
 public class AuthFilter implements Filter {
-
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse resp = (HttpServletResponse) response;
 
-        String loginURI = req.getContextPath() + "/views/login.jsp";
-
-        String loginServlet = req.getContextPath() + "/login";
-
+        String path = req.getRequestURI().substring(req.getContextPath().length());
         HttpSession session = req.getSession(false);
+        boolean loggedIn = (session != null && session.getAttribute("user") != null);
 
-        boolean loggedIn =
-                session != null && session.getAttribute("user") != null;
+        // Ajout de /register et register_form.jsp aux chemins publics
+        boolean isPublicPath = path.equals("/login") ||
+                path.equals("/views/login.jsp") ||
+                path.equals("/register") ||
+                path.equals("/views/register_form.jsp");
+        boolean isResource = path.contains("/assets/");
 
-        boolean loginRequest =
-                req.getRequestURI().equals(loginURI) || req.getRequestURI().equals(loginServlet);
-
-        boolean resourceRequest =
-                req.getRequestURI().contains("/assets/");
-
-        if (loggedIn || loginRequest || resourceRequest) {
+        if (loggedIn || isPublicPath || isResource) {
             chain.doFilter(request, response);
         } else {
-            resp.sendRedirect(loginURI);
+            resp.sendRedirect(req.getContextPath() + "/views/login.jsp");
         }
     }
 }

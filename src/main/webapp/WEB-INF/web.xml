@@ -4,13 +4,8 @@
          xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
          version="6.0">
 
-    <display-name>ERP Application Management System</display-name>
+    <display-name>ERP Management System</display-name>
 
-    <!-- ======================================================= -->
-    <!-- FILTRES (Doivent être placés AVANT les servlets) -->
-    <!-- ======================================================= -->
-
-    <!-- 1. Filtre de Logging -->
     <filter>
         <filter-name>LoggingFilter</filter-name>
         <filter-class>com.erp.filter.LoggingFilter</filter-class>
@@ -20,73 +15,23 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
-    <!-- 2. Filtre d'Authentification -->
     <filter>
         <filter-name>AuthFilter</filter-name>
         <filter-class>com.erp.filter.AuthFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>AuthFilter</filter-name>
-        <url-pattern>/dashboard</url-pattern>
-        <url-pattern>/produits</url-pattern>
-        <url-pattern>/clients</url-pattern>
+        <url-pattern>/*</url-pattern>
     </filter-mapping>
 
-    <!-- 3. Filtre Admin -->
     <filter>
         <filter-name>AdminFilter</filter-name>
         <filter-class>com.erp.filter.AdminFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>AdminFilter</filter-name>
-        <url-pattern>/produits/*</url-pattern>
-        <url-pattern>/clients/*</url-pattern>
+        <url-pattern>/admin/*</url-pattern>
     </filter-mapping>
-
-    <!-- ======================================================= -->
-    <!-- SERVLETS -->
-    <!-- ======================================================= -->
-<!--
-    <servlet>
-        <servlet-name>AuthServlet</servlet-name>
-        <servlet-class>com.erp.web.AuthServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>AuthServlet</servlet-name>
-        <url-pattern>/login</url-pattern>
-        <url-pattern>/logout</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
-        <servlet-name>DashboardServlet</servlet-name>
-        <servlet-class>com.erp.web.DashboardServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>DashboardServlet</servlet-name>
-        <url-pattern>/dashboard</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
-        <servlet-name>ProduitServlet</servlet-name>
-        <servlet-class>com.erp.web.ProduitServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>ProduitServlet</servlet-name>
-        <url-pattern>/produits</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
-        <servlet-name>ClientServlet</servlet-name>
-        <servlet-class>com.erp.web.ClientServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>ClientServlet</servlet-name>
-        <url-pattern>/clients</url-pattern>
-    </servlet-mapping>
--->
-    <!-- ======================================================= -->
-    <!-- CONFIGURATION GENERALE -->
-    <!-- ======================================================= -->
 
     <welcome-file-list>
         <welcome-file>views/login.jsp</welcome-file>
@@ -95,5 +40,4 @@
     <session-config>
         <session-timeout>30</session-timeout>
     </session-config>
-
 </web-app>

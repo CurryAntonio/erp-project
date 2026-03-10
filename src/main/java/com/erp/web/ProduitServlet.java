@@ -1,12 +1,12 @@
 package com.erp.web;
 
 import com.erp.model.Produit;
+import com.erp.model.Utilisateur;
+import com.erp.enums.RoleUtilisateur;
 import com.erp.service.ProduitService;
-
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import jakarta.servlet.ServletException;
-
 import java.io.IOException;
 import java.math.BigDecimal;
 
@@ -16,14 +16,22 @@ public class ProduitServlet extends HttpServlet {
     private ProduitService produitService = new ProduitService();
 
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-        throws ServletException, IOException {
-
+            throws ServletException, IOException {
         req.setAttribute("produits", produitService.listerProduits());
         req.getRequestDispatcher("views/produits.jsp").forward(req, resp);
     }
 
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-        throws IOException {
+            throws IOException {
+
+        HttpSession session = req.getSession();
+        Utilisateur user = (Utilisateur) session.getAttribute("user");
+
+        // SÉCURITÉ : Seul ADMIN ou GESTIONNAIRE peut ajouter
+        if (user == null || user.getRole() == RoleUtilisateur.CLIENT) {
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Action non autorisée pour votre profil.");
+            return;
+        }
 
         Produit p = new Produit();
         p.setLibelle(req.getParameter("libelle"));
@@ -32,7 +40,6 @@ public class ProduitServlet extends HttpServlet {
         p.setQuantiteStock(Integer.parseInt(req.getParameter("stock")));
 
         produitService.creerProduit(p);
-
-        resp.sendRedirect("produits");
+        resp.sendRedirect("produits?success=1");
     }
 }

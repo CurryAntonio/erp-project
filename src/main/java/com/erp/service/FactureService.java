@@ -1,31 +1,17 @@
 package com.erp.service;
 
-import com.erp.model.Commande;
+import com.erp.dao.FactureDAO;
 import com.erp.model.Facture;
-import com.erp.util.JPAUtil;
-import jakarta.persistence.EntityManager;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.util.List;
 
 public class FactureService {
+    private FactureDAO factureDAO = new FactureDAO();
 
-    public Facture genererFacture(Commande commande) {
-        EntityManager em = JPAUtil.getEntityManager();
-        em.getTransaction().begin();
-
-        Facture facture = new Facture();
-        facture.setCommande(commande);
-        facture.setDateFacturation(LocalDate.now());
-
-        BigDecimal totalTTC = commande.getMontantTotal().multiply(new BigDecimal("1.20"));
-
-        facture.setMontantTotalTTC(totalTTC);
-
-        em.persist(facture);
-        em.getTransaction().commit();
-        em.close();
-
-        return facture;
+    public List<Facture> getFacturesForUser(Long clientId, boolean isAdminOrManager) {
+        if (isAdminOrManager) {
+            return factureDAO.findAll();
+        } else {
+            return factureDAO.findByClientId(clientId);
+        }
     }
 }
